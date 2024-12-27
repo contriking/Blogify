@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
+import axios from 'axios';
+
+// Importing the URL from the .env file
+const URL=process.env.VITE_APP_BASE_URL;
 
 const Register=()=>{
     const [UserData,setUserData]=useState({
@@ -9,17 +13,40 @@ const Register=()=>{
         password2: ''
     })
 
+    const [error,setError]=useState('');
+    const navigate = useNavigate();
+
     const changeInputHandler= (e)=>{
         setUserData(prevState=>{
             return {...prevState , [e.target.name] : e.target.value}
         })
     }
+
+    const registerUser= async(e)=>{
+        e.preventDefault();
+        setError('');
+        try {
+            const response= await axios.post(`${URL}/users/register`,UserData);
+            console.log(response);  
+            
+            const newUser = await response.data;
+            console.log(newUser);
+            if(!newUser){
+                setError("Couldn't register user. Try again.");
+            }
+            navigate('/login');
+        }
+        catch (error) {
+            setError(error.response.data.message);
+        }
+    }
+
     return (
         <section className="register">
             <div className="container">
                 <h2>Sign Up</h2>
-                <form className="register_form form">
-                    <p className="form_error-message">This is the error message</p>
+                <form className="register_form form" onSubmit={registerUser}>
+                    { error && <p className="form_error-message">{error}</p>}
                     <input type="text" placeholder="Full Name" name='name' value={UserData.name} onChange={changeInputHandler}/>
                     <input type="text" placeholder="Email" name='email' value={UserData.email} onChange={changeInputHandler}/>
                     <input type="text" placeholder="Password" name='password' value={UserData.password} onChange={changeInputHandler}/>
