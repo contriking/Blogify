@@ -6,7 +6,6 @@ import { FaCheck } from "react-icons/fa";
 import { UserContext } from "../context/userContext";
 import axios from "axios";
 
-
 const UserProfile=()=>{
     const [avatar,setAvatar]=useState('');
     const [name,setName] =useState('');
