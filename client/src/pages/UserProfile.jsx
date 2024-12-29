@@ -50,7 +50,6 @@ const UserProfile=()=>{
                 {withCredentials: true, headers: { Authorization: `Bearer ${token}`}}
             )
             setAvatar(response?.data.avatar);
-            console.log(avatar)
         } catch (error) {
             console.log(error);
         }

@@ -26,11 +26,8 @@ const Register=()=>{
         e.preventDefault();
         setError('');
         try {
-            const response= await axios.post(`${URL}/users/register`,UserData);
-            console.log(response);  
-            
+            const response= await axios.post(`${URL}/users/register`,UserData); 
             const newUser = await response.data;
-            console.log(newUser);
             if(!newUser){
                 setError("Couldn't register user. Try again.");
             }
