@@ -576,14 +576,14 @@ input , select , textarea{
         width: 100%;
         box-shadow: -2rem 4rem 4rem rgba(0,0,0,0.26);
         animation: dropdown 500ms ease forwards;
-        /* opacity: 0; */
+        opacity: 0;
         transform: rotateX(90deg);
         transform-origin: top;
     }
 
     @keyframes dropdown {
         to{
-            opasity: 1;
+            opacity: 1;
             transform: rotateX(0);
         }
     }
