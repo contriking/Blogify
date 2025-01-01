@@ -2,7 +2,7 @@ import React  , {useContext , useEffect , useState} from "react";
 import PostAuthor from "../components/PostAuthor";
 import { Link, useParams } from "react-router-dom";
 
-import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/userContext";
 import DeletePost from "./DeletePost";
 import Loader from "../components/Loader";
 import axios from "axios";
