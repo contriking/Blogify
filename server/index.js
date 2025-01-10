@@ -13,7 +13,7 @@ const app=express();
 // app.use(express.json({extended : true}))
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
-app.use(cors({credentials : true , origin: "http://localhost:5173"}))
+app.use(cors({credentials : true , origin: "https://blogify-frontend-mfkq.onrender.com"}))
 
 app.use(upload())  
 app.use('/uploads',express.static(__dirname + '/uploads'))
