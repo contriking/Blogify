@@ -26,7 +26,7 @@ const Login=()=>{
         e.preventDefault();
         setError('');
         try {
-            const response= await axios.post(`${process.env.VITE_APP_BASE_URL}/users/login`,UserData);
+            const response= await axios.post(`http://localhost:5000/api/users/login`,UserData);
             const user=await response.data;
             setCurrUser(user);
             navigate('/');

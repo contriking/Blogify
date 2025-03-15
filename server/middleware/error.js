@@ -1,12 +1,3 @@
-// Unsupported routes
-
-const notFound=(req,res,next)=>{
-    const error = new Error(`Not Found - ${req.originalUrl}`);
-    res.status(404);
-    next(error);
-}
-
-
 // MiddleWare to handle Errors
 
 const errorHandler=(error,req,res,next)=>{
@@ -17,6 +8,5 @@ const errorHandler=(error,req,res,next)=>{
 }
 
 module.exports ={
-    notFound,
     errorHandler,
 }

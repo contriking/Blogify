@@ -2,6 +2,7 @@ import React, { useState , useEffect , useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'
+import Loader from '../components/Loader';
 
 
 import { UserContext } from '../context/userContext';
@@ -12,6 +13,7 @@ const CreatePost = () => {
   const [category,setCategory]=useState('Uncategorized');
   const [description,setDescription]=useState('');
   const [thumbnail,setThumbnail]=useState('');
+  const [isLoading,setIsLoading]=useState(false);
 
   const [error,setError] = useState('');
 
@@ -56,7 +58,8 @@ const CreatePost = () => {
       postData.set('thumbnail',thumbnail)
 
       try {
-        const response= await axios.post(`${process.env.VITE_APP_BASE_URL}/posts`,postData ,
+        setIsLoading(true);
+        const response= await axios.post(`http://localhost:5000/api/posts`,postData ,
            {withCredentials: true , headers: { Authorization: `Bearer ${token}`}})
 
         if(response.status == 201){
@@ -64,12 +67,17 @@ const CreatePost = () => {
         }
 
       } catch (err) {
-        console.log(err);
         setError(err.response.data.message);
+      }
+      finally{
+        setIsLoading(false);
       }
 
     }
 
+  if(isLoading){
+    return <Loader/>
+  }
 
   return (
     <section className="create-post">

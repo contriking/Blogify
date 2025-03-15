@@ -1,7 +1,6 @@
 import React, { useState , useEffect } from 'react'
 
 import PostItem from './PostItem';
-import {DUMMY_POSTS} from '../data.js';
 import Loader from './Loader.jsx';
 import axios from 'axios';
 
@@ -13,7 +12,7 @@ const Posts = () => {
       const  fetchPosts=async()=>{
         setIsLoading(true);
         try {
-          const response = await axios.get(`${process.env.VITE_APP_BASE_URL}/posts`);
+          const response = await axios.get(`http://localhost:5000/api/posts`);
           setPosts(response.data);
         } catch (error) {
           console.log(error);

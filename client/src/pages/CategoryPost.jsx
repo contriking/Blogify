@@ -15,7 +15,7 @@ const CategoryPost = () => {
     const  fetchPosts=async()=>{
       setIsLoading(true);
       try {
-        const response = await axios.get(`${process.env.VITE_APP_BASE_URL}/posts/categories/${category}`);
+        const response = await axios.get(`http://localhost:5000/api/posts/categories/${category}`);
         setPosts(response.data);
       } catch (error) {
         console.log(error);
@@ -33,8 +33,16 @@ return (
   <section className='posts'>
       {posts.length > 0 ? <div className="container posts_container">
           {posts.map(({_id: id,thumbnail,category,title,description,creator, createdAt}) =>
-               <PostItem key={id} postID={id} thumbnail={thumbnail} category={category} title={title} 
-                  description={description} authorID={creator} createdAt={createdAt} />)
+               <PostItem 
+                  key={id} 
+                  postID={id} 
+                  thumbnail={thumbnail} 
+                  category={category} 
+                  title={title} 
+                  description={description} 
+                  authorID={creator} 
+                  createdAt={createdAt} 
+                />)
           }
       </div> : <h2 className='center'>No Posts found</h2> }
   </section>

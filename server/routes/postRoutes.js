@@ -1,6 +1,15 @@
 const { Router } = require('express');
 
-const {createPost,getPosts,getPost,getCatPosts,getUserPosts,editPost,deletePost}=require('../controllers/postControllers');
+const {
+    createPost,
+    getPosts,
+    getPost,
+    getCatPosts,
+    getUserPosts,
+    editPost,
+    deletePost
+}=require('../controllers/postControllers');
+
 const auth = require('../middleware/auth');
 
 const router = Router();

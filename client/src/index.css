@@ -253,6 +253,7 @@ footer{
 .post_thumbnail{
     border-radius: var(--radius-3);
     overflow: hidden;
+    object-fit:contain; 
     /* change */
     height: 10rem;
 }

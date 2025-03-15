@@ -8,12 +8,11 @@ const { v4:uuid}=require("uuid");
 
 
 // Register a new user
-
 // POST : api/users/register
 // Unprotected
 const registerUser= async(req,res,next)=>{
     try {
-        // res.json("Register user");
+        
         const {name,email,password,password2}=req.body;
         if(!name || !email || !password || !password2){
             return next(new HttpError("Please fill in all fields.",422));
@@ -51,12 +50,11 @@ const registerUser= async(req,res,next)=>{
 
 
 // Login a registered user
-
 // POST : api/users/login
 // Unprotected
 const loginUser=async(req,res,next)=>{
     try {
-        // res.json("Login user");
+       
         const {email,password}=req.body;
         if(!email || !password){
             return next(new HttpError("Please fill all fields.",422));
@@ -79,40 +77,31 @@ const loginUser=async(req,res,next)=>{
     }
 }
 
-
-// ERROR
-
 // UserProfile
-
 // Get : api/users/:id
 // Protected
 const getUser=async(req,res,next)=>{
     try {
-        // res.json("User profile");
+       
         const {id}=req.params;
         const user= await User.findById(id).select("-password");
 
         if(!user){
             return next(new HttpError("User not available.",404));
         }
-        // console.dir(user);
+        
         res.status(200).json(user);
     } catch (error) {
         return next(new HttpError(error));
     }
 }
 
-// const path = require('../uploads');
-
 // Change user Avatar
-
 // POST : api/users/change-avatar
 // Protected
 const changeAvatar=async(req,res,next)=>{
     try {
-        // res.json("Change user avatar");
-        // res.json(req.files);
-        // console.log(req.files);
+       
         if(!req.files.avatar){
             return next(new HttpError("Please choose an image.",422));
         }
@@ -121,7 +110,7 @@ const changeAvatar=async(req,res,next)=>{
         const user=await User.findById(req.user.id);
         // delete old avatar
         if(user.avatar){
-            // console.log(__dirname)
+            
             fs.unlink(path.join(__dirname , '..' , 'uploads' , user.avatar),(err)=>{
                 if(err){
                     return next(new HttpError(err));
@@ -156,12 +145,11 @@ const changeAvatar=async(req,res,next)=>{
 }
 
 // Edit user detals
-
 // POST : api/users/edit-user
 // Protected
 const editUser=async(req,res,next)=>{
     try {
-        // res.json("Edit Users");
+      
         const {name,email,password,newPassword,confirmNewPassword}=req.body;
         if(!name || !email || !password || !newPassword){
             return next(new HttpError("Please fill in all fields.",422));
@@ -204,12 +192,11 @@ const editUser=async(req,res,next)=>{
 }
 
 //Get Authors
-
 // GET : api/users/authors
 // Unprotected
 const getAuthors=async(req,res,next)=>{
     try {
-        // res.json("Get all users/authors");
+     
         const authors= await User.find().select('--password');
         res.json(authors);
     } catch (error) {

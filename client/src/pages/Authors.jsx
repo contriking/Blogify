@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import Loader from '../components/Loader';
 
-
+import profilePic from '../images/avatar.png'
 
 const Authors = () => {
   const [authors,setAuthors]=useState('');
@@ -13,7 +13,7 @@ const Authors = () => {
     const getAuthor=async()=>{
       setIsLoading(true);
       try {
-        const response= await axios.get(`${process.env.VITE_APP_BASE_URL}/users`);
+        const response= await axios.get(`http://localhost:5000/api/users`);
         setAuthors(response.data);
       } catch (error) {
         console.log(error);
@@ -34,7 +34,7 @@ const Authors = () => {
           authors.map(({_id: id,avatar,name,posts})=>{
             return <Link key={id} to={`/posts/users/${id}`} className='author'>
               <div className="author_avatar">
-                <img src={`${process.env.VITE_APP_ASSETS_URL}/uploads/${avatar}`} alt={`Image of ${name}`} />
+                {avatar!==undefined ? <img src={ `${process.env.VITE_APP_ASSETS_URL}/uploads/${avatar}`} alt={`Image of ${name}`}/> : <img src={profilePic } alt={`Image of ${name}`} /> }
               </div>
               <div className="author_info">
                 <h4>{name}</h4>

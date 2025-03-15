@@ -1,5 +1,4 @@
 import React, { useState , useEffect , useContext } from 'react'
-import { DUMMY_POSTS } from '../data.js';
 import DeletePost from './DeletePost.jsx'
 import { Link , useNavigate , useParams } from 'react-router-dom';
 import { UserContext } from '../context/userContext'; 
@@ -28,7 +27,7 @@ const DashBoard = () => {
     const fetchPosts= async ()=>{
       setIsLoading(true);
       try {
-        const response=await axios.get(`${process.env.VITE_APP_BASE_URL}/posts/users/${currUser.id}`,
+        const response=await axios.get(`http://localhost:5000/api/posts/users/${currUser.id}`,
           {withCredentials : true , headers: {Authorization : `Bearer ${token}`}});
         setPosts(response.data)
       } catch (error) {

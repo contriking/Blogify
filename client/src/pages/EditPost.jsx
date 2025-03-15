@@ -50,11 +50,12 @@ const EditPost = () => {
     useEffect(()=>{
       const getPost= async ()=>{
         try {
-          const response= await axios.get(`${process.env.VITE_APP_BASE_URL}/posts/${id}`);
+          setError('')
+          const response= await axios.get(`http://localhost:5000/api/posts/${id}`);
           setTitle(response.data.title)
           setDescription(response.data.description)
         } catch (err) {
-          console.log(err)
+          setError(err.response.data.message);
         }  
       }
       getPost();
@@ -70,7 +71,8 @@ const EditPost = () => {
       postData.set('thumbnail',thumbnail)
 
       try {
-        const response= await axios.patch(`${process.env.VITE_APP_BASE_URL}/posts/${id}`,postData ,
+        setError('');
+        const response= await axios.patch(`http://localhost:5000/api/posts/${id}`,postData ,
            {withCredentials: true , headers: { Authorization: `Bearer ${token}`}})
 
         if(response.status == 200){

@@ -20,7 +20,7 @@ const DeletePost = ({postId : id}) => {
     const removePost =async()=>{
       try {
         setIsLoading(true)
-        const response = await axios.delete(`${process.env.VITE_APP_BASE_URL}/posts/${id}`,{withCredentials:
+        const response = await axios.delete(`http://localhost:5000/api/posts/${id}`,{withCredentials:
           true, headers : { Authorization : `Bearer ${token}`}
         })
 

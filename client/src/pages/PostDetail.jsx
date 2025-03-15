@@ -17,12 +17,13 @@ const PostDetail=()=>{
 
     useEffect(()=>{
         const getPost= async()=>{
+            setError('');
             setIsLoading(true);
             try {
-                const response= await axios.get(`${process.env.VITE_APP_BASE_URL}/posts/${id}`);
+                const response= await axios.get(`http://localhost:5000/api/posts/${id}`);
                 setPost(response.data);
             } catch (error) {
-                console.log(error);
+                setError(error.response.data.message);
             }
             setIsLoading(false);
         }

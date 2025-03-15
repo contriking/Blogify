@@ -11,7 +11,7 @@ const HttpError = require('../models/Error');
 // Protected
 const createPost=async (req,res,next)=>{
     try {
-        // res.json("Create Post");
+        
         let {title,category,description} = req.body;
         if(!title || !category || !description || !req.files){
             return next(new HttpError("Please fill in all fields and choose thumbnail.",422));
@@ -55,7 +55,7 @@ const createPost=async (req,res,next)=>{
 // UnProtected
 const getPosts=async (req,res,next)=>{
     try {
-        // res.json("Get all Posts");
+       
         const posts=await Post.find().sort({updatedAt: -1});
         res.status(200).json(posts);
     } catch (error) {
@@ -69,7 +69,7 @@ const getPosts=async (req,res,next)=>{
 // UnProtected
 const getPost=async (req,res,next)=>{
     try {
-        // res.json("Get single Post")
+       
         const postId=req.params.id;
         const post= await Post.findById(postId);
         if(!post){
@@ -87,7 +87,7 @@ const getPost=async (req,res,next)=>{
 // UnProtected
 const getCatPosts=async (req,res,next)=>{
     try {
-        // res.json("Get Post by category")
+       
         const {category}=req.params;
         const catPosts = await Post.find({category}).sort({createdAt: -1});
         res.status(200).json(catPosts);
@@ -101,7 +101,7 @@ const getCatPosts=async (req,res,next)=>{
 // UnProtected
 const getUserPosts=async (req,res,next)=>{
     try {
-        // res.json("Get User Posts")
+    
         const {id}=req.params;
         const posts=await Post.find({creator: id}).sort({createdAt: -1});
         res.status(200).json(posts);
@@ -115,7 +115,7 @@ const getUserPosts=async (req,res,next)=>{
 // Protected
 const editPost=async (req,res,next)=>{
     try {
-        // res.json("Edit Post")
+      
         let fileName;
         let newFileName;
         let updatedPost;
@@ -183,7 +183,7 @@ const editPost=async (req,res,next)=>{
 // Protected
 const deletePost=async (req,res,next)=>{
     try {
-        // res.json("Delete Post")
+       
         const postId=req.params.id;
         if(!postId){
             return next(new HttpError("Post not found.",400));
