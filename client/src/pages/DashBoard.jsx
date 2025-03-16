@@ -2,8 +2,7 @@ import React, { useState , useEffect , useContext } from 'react'
 import DeletePost from './DeletePost.jsx'
 import { Link , useNavigate , useParams } from 'react-router-dom';
 import { UserContext } from '../context/userContext'; 
-
-import axios from 'axios';
+import axiosInstance from '../utils/axios.js';
 import Loader from '../components/Loader.jsx'
 
 const DashBoard = () => {
@@ -27,7 +26,7 @@ const DashBoard = () => {
     const fetchPosts= async ()=>{
       setIsLoading(true);
       try {
-        const response=await axios.get(`http://localhost:5000/api/posts/users/${currUser.id}`,
+        const response=await axiosInstance.get(`/posts/users/${currUser.id}`,
           {withCredentials : true , headers: {Authorization : `Bearer ${token}`}});
         setPosts(response.data)
       } catch (error) {

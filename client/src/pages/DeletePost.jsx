@@ -1,8 +1,8 @@
 import React , { useEffect , useContext, useState } from 'react'
 import { Link, useNavigate , useLocation } from 'react-router-dom'
-import axios from 'axios'
 import { UserContext } from '../context/userContext'
 import Loader from '../components/Loader'
+import axiosInstance from '../utils/axios'
 
 const DeletePost = ({postId : id}) => {
   const [isLoading,setIsLoading]=useState(false);
@@ -20,8 +20,8 @@ const DeletePost = ({postId : id}) => {
     const removePost =async()=>{
       try {
         setIsLoading(true)
-        const response = await axios.delete(`http://localhost:5000/api/posts/${id}`,{withCredentials:
-          true, headers : { Authorization : `Bearer ${token}`}
+        const response = await axiosInstance.delete(`/posts/${id}`,
+          {withCredentials:true, headers : { Authorization : `Bearer ${token}`}
         })
 
         if(response.status == 200){

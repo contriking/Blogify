@@ -4,8 +4,7 @@ import 'react-quill/dist/quill.snow.css'
 
 import { useNavigate , useParams } from 'react-router-dom';
 import { UserContext } from '../context/userContext';
-import axios from 'axios';
-
+import axiosInstance from '../utils/axios';
 const EditPost = () => {
   const [title,setTitle]=useState('');
   const [category,setCategory]=useState('Uncategorized');
@@ -51,7 +50,7 @@ const EditPost = () => {
       const getPost= async ()=>{
         try {
           setError('')
-          const response= await axios.get(`http://localhost:5000/api/posts/${id}`);
+          const response= await axiosInstance.get(`/posts/${id}`);
           setTitle(response.data.title)
           setDescription(response.data.description)
         } catch (err) {
@@ -72,7 +71,7 @@ const EditPost = () => {
 
       try {
         setError('');
-        const response= await axios.patch(`http://localhost:5000/api/posts/${id}`,postData ,
+        const response= await axiosInstance.patch(`/posts/${id}`,postData ,
            {withCredentials: true , headers: { Authorization: `Bearer ${token}`}})
 
         if(response.status == 200){

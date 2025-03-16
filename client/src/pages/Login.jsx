@@ -1,7 +1,6 @@
 import React, { useState , useContext } from "react";
 import { Link , useNavigate } from "react-router-dom";
-import axios from "axios";
-
+import axiosInstance from "../utils/axios";
 import { UserContext } from "../context/userContext";
 
 
@@ -26,7 +25,7 @@ const Login=()=>{
         e.preventDefault();
         setError('');
         try {
-            const response= await axios.post(`http://localhost:5000/api/users/login`,UserData);
+            const response= await axiosInstance.post(`/users/login`,UserData);
             const user=await response.data;
             setCurrUser(user);
             navigate('/');

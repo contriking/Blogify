@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'
 import Loader from '../components/Loader';
-
+import axiosInstance from '../utils/axios';
 
 import { UserContext } from '../context/userContext';
-import axios from 'axios';
 
 const CreatePost = () => {
   const [title,setTitle]=useState('');
@@ -59,7 +58,7 @@ const CreatePost = () => {
 
       try {
         setIsLoading(true);
-        const response= await axios.post(`http://localhost:5000/api/posts`,postData ,
+        const response= await axiosInstance.post(`/posts`,postData ,
            {withCredentials: true , headers: { Authorization: `Bearer ${token}`}})
 
         if(response.status == 201){

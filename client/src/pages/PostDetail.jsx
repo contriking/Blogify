@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 import DeletePost from "./DeletePost";
 import Loader from "../components/Loader";
-import axios from "axios";
+import axiosInstance from "../utils/axios";
 
 const PostDetail=()=>{
     const {id} = useParams();
@@ -20,7 +20,7 @@ const PostDetail=()=>{
             setError('');
             setIsLoading(true);
             try {
-                const response= await axios.get(`http://localhost:5000/api/posts/${id}`);
+                const response= await axiosInstance.get(`/posts/${id}`);
                 setPost(response.data);
             } catch (error) {
                 setError(error.response.data.message);

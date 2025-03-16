@@ -5,6 +5,7 @@ import { FaCheck } from "react-icons/fa";
 import profilePic from '../images/avatar.png'
 import { UserContext } from "../context/userContext";
 import axios from "axios";
+import axiosInstance from "../utils/axios";
 
 const UserProfile=()=>{
     const [avatar,setAvatar]=useState('');
@@ -14,7 +15,6 @@ const UserProfile=()=>{
     const [newPassword,setNewPassword] =useState('');
     const [confireNewPassword,setConfireNewPassword] =useState('');
     const [error,setError]=useState('');
-    const [imageError,setImageError]=useState('');
 
     const [isAvatar,setIsAvatar]=useState(false);
 
@@ -30,7 +30,7 @@ const UserProfile=()=>{
 
     useEffect(()=>{
         const getUser=async ()=>{
-            const response=await axios.get(`http://localhost:5000/api/users/${currUser.id}`,
+            const response=await axiosInstance.get(`/users/${currUser.id}`,
                 {withCredentials: true , headers : {Authorization: `Bearer ${token}`}}
             )
             const {name,email,avatar}=response.data;
@@ -45,21 +45,14 @@ const UserProfile=()=>{
     const changeAvatarHandler= async ()=>{
         setIsAvatar(false);
         try {
-            
-            if(avatar){
-                const postData = new FormData();
-                postData.set('avatar',avatar)
-                const response = await axios.post(`http://localhost:5000/api/users/change-avatar`,postData,
-                    {withCredentials: true, headers: { Authorization: `Bearer ${token}`}}
-                )
-                setAvatar(response?.data.avatar);
-            }
-            else{
-                setImageError("Please Choose an image")
-            }
-            
+            const postData = new FormData();
+            postData.set('avatar',avatar)
+            const response = await axiosInstance.post(`/users/change-avatar`,postData,
+                {withCredentials: true, headers: { Authorization: `Bearer ${token}`}}
+            )
+            setAvatar(response?.data.avatar);
         } catch (error) {
-            setImageError(error.response.data.message);
+            console.log(error);
         }
     }
 
@@ -74,7 +67,7 @@ const UserProfile=()=>{
         userData.set('confirmNewPassword',confireNewPassword)
 
         try {
-            const response= await axios.patch(`http://localhost:5000/api/users/edit-user`,userData,
+            const response= await axiosInstance.patch(`/users/edit-user`,userData,
                 {withCredentials: true, headers: {Authorization: `Bearer ${token}`}}
             )
         
@@ -95,7 +88,6 @@ const UserProfile=()=>{
 
                 <div className="profile_details">
                     <div className="avatar_wrapper">
-                        {imageError && <p className="form_error-message">{imageError}</p>}
                         <div className="profile_avatar">
                             {avatar!==undefined ? <img src={ `${process.env.VITE_APP_ASSETS_URL}/uploads/${avatar}`} alt={`Image of ${name}`} /> : <img src={profilePic } alt={`Image of ${name}`} /> }
                         </div>

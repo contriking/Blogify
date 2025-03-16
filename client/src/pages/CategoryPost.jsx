@@ -3,7 +3,7 @@ import { useState , useEffect }  from 'react';
 import PostItem from '../components/PostItem';
 import Loader from '../components/Loader';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 
 const CategoryPost = () => {
   const [posts,setPosts]=useState([]);
@@ -15,7 +15,7 @@ const CategoryPost = () => {
     const  fetchPosts=async()=>{
       setIsLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/api/posts/categories/${category}`);
+        const response = await axiosInstance.get(`/posts/categories/${category}`);
         setPosts(response.data);
       } catch (error) {
         console.log(error);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 import profilePic from '../images/avatar.png'
+import axiosInstance from '../utils/axios'
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
@@ -18,7 +18,7 @@ const PostAuthor = ({authorID,createdAt}) => {
   useEffect(()=>{
     const getAuthor= async()=>{
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/${authorID}`);
+        const response = await axiosInstance.get(`/users/${authorID}`);
         setAuthor(response?.data);
       } catch (error) {
         console.log(error);
@@ -30,7 +30,6 @@ const PostAuthor = ({authorID,createdAt}) => {
   return (
     <Link to={`/posts/users/${authorID}`} className='post_author'>
         <div className="post_author-avatar">
-            {/* <img src={`${process.env.VITE_APP_ASSETS_URL}/uploads/${author.avatar}`} alt="" /> */}
             {author.avatar!==undefined ? <img src={ `${process.env.VITE_APP_ASSETS_URL}/uploads/${author.avatar}`} alt=""/> : <img src={profilePic } alt="" /> }
         </div>
         <div className="post_author-details">

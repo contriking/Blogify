@@ -2,7 +2,7 @@ import React, { useState , useEffect } from 'react'
 
 import PostItem from './PostItem';
 import Loader from './Loader.jsx';
-import axios from 'axios';
+import axiosInstance from '../utils/axios.js';
 
 const Posts = () => {
     const [posts,setPosts]=useState([]);
@@ -12,7 +12,7 @@ const Posts = () => {
       const  fetchPosts=async()=>{
         setIsLoading(true);
         try {
-          const response = await axios.get(`http://localhost:5000/api/posts`);
+          const response = await axiosInstance.get(`/posts`);
           setPosts(response.data);
         } catch (error) {
           console.log(error);

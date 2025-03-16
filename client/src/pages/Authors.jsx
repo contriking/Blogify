@@ -1,10 +1,9 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import Loader from '../components/Loader';
 
 import profilePic from '../images/avatar.png'
-
+import axiosInstance from '../utils/axios';
 const Authors = () => {
   const [authors,setAuthors]=useState('');
   const [isLoading,setIsLoading]=useState(false);
@@ -13,7 +12,7 @@ const Authors = () => {
     const getAuthor=async()=>{
       setIsLoading(true);
       try {
-        const response= await axios.get(`http://localhost:5000/api/users`);
+        const response= await axiosInstance.get(`/users`);
         setAuthors(response.data);
       } catch (error) {
         console.log(error);

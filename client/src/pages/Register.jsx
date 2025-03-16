@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Link , useNavigate } from "react-router-dom";
-import axios from 'axios';
-
-// Importing the URL from the .env file
-const URL=process.env.VITE_APP_BASE_URL;
+import axiosInstance from "../utils/axios";
 
 const Register=()=>{
     const [UserData,setUserData]=useState({
@@ -26,7 +23,7 @@ const Register=()=>{
         e.preventDefault();
         setError('');
         try {
-            const response= await axios.post(`http://localhost:5000/api/users/register`,UserData); 
+            const response= await axiosInstance.post(`/users/register`,UserData); 
             const newUser = await response.data;
             if(!newUser){
                 setError("Couldn't register user. Try again.");
