@@ -2,7 +2,7 @@ import React, { useState , useContext } from "react";
 import { Link , useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import { UserContext } from "../context/userContext";
-
+import { toast } from "react-toastify";
 
 const Login=()=>{
     const [UserData,setUserData]=useState({
@@ -28,6 +28,7 @@ const Login=()=>{
             const response= await axiosInstance.post(`/users/login`,UserData);
             const user=await response.data;
             setCurrUser(user);
+            toast.success("Login successful.");
             navigate('/');
         } catch (err) {
             setError(err.response.data.message);

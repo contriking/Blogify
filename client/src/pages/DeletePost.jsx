@@ -3,6 +3,7 @@ import { Link, useNavigate , useLocation } from 'react-router-dom'
 import { UserContext } from '../context/userContext'
 import Loader from '../components/Loader'
 import axiosInstance from '../utils/axios'
+import { toast } from 'react-toastify'
 
 const DeletePost = ({postId : id}) => {
   const [isLoading,setIsLoading]=useState(false);
@@ -23,7 +24,7 @@ const DeletePost = ({postId : id}) => {
         const response = await axiosInstance.delete(`/posts/${id}`,
           {withCredentials:true, headers : { Authorization : `Bearer ${token}`}
         })
-
+        toast.success("Post deleted.")
         if(response.status == 200){
           if(location.pathname == `/myposts/${currUser.id}`){
             navigate(0);

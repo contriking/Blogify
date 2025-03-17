@@ -33,7 +33,7 @@ const Authors = () => {
           authors.map(({_id: id,avatar,name,posts})=>{
             return <Link key={id} to={`/posts/users/${id}`} className='author'>
               <div className="author_avatar">
-                {avatar!==undefined ? <img src={ `${process.env.VITE_APP_ASSETS_URL}/uploads/${avatar}`} alt={`Image of ${name}`}/> : <img src={profilePic } alt={`Image of ${name}`} /> }
+                <img src={avatar || profilePic} alt={`Image of ${name}`} />
               </div>
               <div className="author_info">
                 <h4>{name}</h4>

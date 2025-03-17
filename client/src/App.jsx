@@ -14,7 +14,7 @@ import EditPost from './pages/EditPost';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
 import UserProfile from './pages/UserProfile';
-
+import {ToastContainer} from 'react-toastify'
 
 import  UserProvider  from './context/userContext' 
 
@@ -45,7 +45,16 @@ const App = ()  => {
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  // return <RouterProvider router={router} />;
+  return(
+    <>
+      <RouterProvider router={router}/>
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}        
+      />
+    </>
+  )
 };
 
 export default App

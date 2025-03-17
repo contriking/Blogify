@@ -2,10 +2,8 @@ const HttpError = require("../models/Error.js");
 const User = require("../models/User.js");
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
-const fs=require('fs');
-const path=require('path');
-const { v4:uuid}=require("uuid");
-
+const cloudinary =require('../utils/cloudinary.js');
+const { extractor } = require('../utils/pidExtractor.js');
 
 // Register a new user
 // POST : api/users/register
@@ -71,7 +69,7 @@ const loginUser=async(req,res,next)=>{
         const { _id: id , name} = user;
         const token=jwt.sign({id,name}, process.env.JWT_SECRET,{expiresIn: "1d"});
         res.status(200).json({token,id,name});
-        // res.status(200).json("Login Successful");
+        
     } catch (error) {
         return next(new HttpError("Login failed.",422));
     }
@@ -101,8 +99,8 @@ const getUser=async(req,res,next)=>{
 // Protected
 const changeAvatar=async(req,res,next)=>{
     try {
-       
-        if(!req.files.avatar){
+
+        if(!req.body.avatar){
             return next(new HttpError("Please choose an image.",422));
         }
 
@@ -111,33 +109,28 @@ const changeAvatar=async(req,res,next)=>{
         // delete old avatar
         if(user.avatar){
             
-            fs.unlink(path.join(__dirname , '..' , 'uploads' , user.avatar),(err)=>{
-                if(err){
-                    return next(new HttpError(err));
-                }
-            })
+            const public_ID = extractor(user.avatar);
+            cloudinary.uploader.destroy(`Blogify/${public_ID}`);
         }
 
-        const {avatar}=req.files;
-        // check file size
+        const {avatar}=req.body;
+        // Check file size
         if(avatar.size > 500000){
             return next(new HttpError("Proflie pictuer too big. Should be less than 500kb"),422);
         }
 
-        let fileName;
-        fileName= avatar.name;
-        let splittedFile=fileName.split(".");
-        let newFileName=splittedFile[0]+ uuid() + '.' + splittedFile[splittedFile.length -  1];
-        avatar.mv(path.join(__dirname , '..' ,'uploads', newFileName), async(err)=>{
-            if(err){
-                return next(new HttpError(err));
-            }
-            const updatedAvatar = await User.findByIdAndUpdate(req.user.id,{avatar:newFileName},{new: true});
-            if(!updatedAvatar){
-                return next(new HttpError("Avatar could not be updated",422));
-            }
-            res.status(200).json(updatedAvatar)
-        })
+        const uploadResponse = await cloudinary.uploader.upload(avatar,{folder: "Blogify"});
+        const updatedUser=await User.findByIdAndUpdate(
+            req.user.id,
+            {avatar:uploadResponse.secure_url},
+            {new: true}
+        ).select('-password')
+
+        if(!updatedUser){
+            return next(new HttpError("Avatar could not be updated",422));
+        }        
+
+        res.status(200).json(updatedUser);
 
     } catch (error) {
         return next(new HttpError(error));
@@ -154,8 +147,8 @@ const editUser=async(req,res,next)=>{
         if(!name || !email || !password || !newPassword){
             return next(new HttpError("Please fill in all fields.",422));
         }
-        // get user from database
-        // Current User
+        
+        // get current User from database
         const user= await User.findById(req.user.id);
         if(!user){
             return next(new HttpError("User not found.",403));

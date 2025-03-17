@@ -6,6 +6,7 @@ import profilePic from '../images/avatar.png'
 import { UserContext } from "../context/userContext";
 import axios from "axios";
 import axiosInstance from "../utils/axios";
+import { toast } from "react-toastify";
 
 const UserProfile=()=>{
     const [avatar,setAvatar]=useState('');
@@ -15,6 +16,8 @@ const UserProfile=()=>{
     const [newPassword,setNewPassword] =useState('');
     const [confireNewPassword,setConfireNewPassword] =useState('');
     const [error,setError]=useState('');
+    const [selectedImg,setSelectedImg]=useState(null);
+    const [imageError,setImageError]=useState('')
 
     const [isAvatar,setIsAvatar]=useState(false);
 
@@ -41,18 +44,44 @@ const UserProfile=()=>{
         getUser();
     },[])
 
+    const setImage=async(e)=>{
+        const file= e.target.files[0];
+        if(!file){
+          return;
+        }
+    
+        const reader = new FileReader();
+        
+        reader.readAsDataURL(file);
+    
+        reader.onload= async ()=>{
+            const base64Image= reader.result;
+            setSelectedImg(base64Image);
+        }
+    }
 
     const changeAvatarHandler= async ()=>{
         setIsAvatar(false);
         try {
-            const postData = new FormData();
-            postData.set('avatar',avatar)
-            const response = await axiosInstance.post(`/users/change-avatar`,postData,
-                {withCredentials: true, headers: { Authorization: `Bearer ${token}`}}
-            )
-            setAvatar(response?.data.avatar);
+            setImageError('');
+            if(selectedImg!==null){
+                const postData = new FormData();
+                postData.set('avatar',selectedImg)
+                const id=toast.loading("Please wait...")
+                const response = await axiosInstance.post(`/users/change-avatar`,postData,
+                    {withCredentials: true, headers: { Authorization: `Bearer ${token}`}}
+                ).then(res=>{
+                    setAvatar(res?.data.avatar);
+                    toast.update(id,{render:"Profile picture changed successfully.",type:"success",isLoading:false,autoClose:2000});
+                })
+                
+            }
+            else{
+                setImageError('Please select an image.')
+            }
+            
         } catch (error) {
-            console.log(error);
+            setImageError(error.response.data.message);
         }
     }
 
@@ -70,7 +99,7 @@ const UserProfile=()=>{
             const response= await axiosInstance.patch(`/users/edit-user`,userData,
                 {withCredentials: true, headers: {Authorization: `Bearer ${token}`}}
             )
-        
+            toast.success("User detail updated.")
             if(response.status==200){
                // Log user Out
                navigate('/logout');
@@ -85,15 +114,15 @@ const UserProfile=()=>{
         <section className="profile">
             <div className="container profile_container">
                 <Link to={`/myposts/${currUser.id}`} className="btn">My Posts</Link>
-
+                {imageError && <p className="form_error-message">{imageError}</p>}
                 <div className="profile_details">
                     <div className="avatar_wrapper">
                         <div className="profile_avatar">
-                            {avatar!==undefined ? <img src={ `${process.env.VITE_APP_ASSETS_URL}/uploads/${avatar}`} alt={`Image of ${name}`} /> : <img src={profilePic } alt={`Image of ${name}`} /> }
+                            <img src={selectedImg || avatar || profilePic } alt="Profile" />
                         </div>
                         {/* Form to update avatar */}
                         <form className="avatar_form">
-                            <input type="file" name="avatar" id="avatar" onChange={e => setAvatar(e.target.files[0])}
+                            <input type="file" name="avatar" id="avatar" onChange={setImage}
                             accept="jpg , png , jpeg" />
                             <label htmlFor="avatar" onClick={()=> setIsAvatar(true)}><FaEdit /></label>
                         </form>

@@ -4,7 +4,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'
 import Loader from '../components/Loader';
 import axiosInstance from '../utils/axios';
-
+import { toast } from 'react-toastify';
 import { UserContext } from '../context/userContext';
 
 const CreatePost = () => {
@@ -44,35 +44,51 @@ const CreatePost = () => {
   ]
 
   const POST_CATEGORIES = ["Agriculture" , "Business" , "Education" , "Entertainment" , "Art" , "Investment",
-    "Uncategorized", "Weather"]
+    "Uncategorized", "Weather"
+  ]
 
-
-    const createPost= async (e)=>{
-      e.preventDefault();
-
-      const postData= new FormData();
-      postData.set('title',title)
-      postData.set('category',category)
-      postData.set('description',description)
-      postData.set('thumbnail',thumbnail)
-
-      try {
-        setIsLoading(true);
-        const response= await axiosInstance.post(`/posts`,postData ,
-           {withCredentials: true , headers: { Authorization: `Bearer ${token}`}})
-
-        if(response.status == 201){
-          return navigate('/');
-        }
-
-      } catch (err) {
-        setError(err.response.data.message);
-      }
-      finally{
-        setIsLoading(false);
-      }
-
+  const thumbnailHandler=(e)=>{
+    
+    const file=e.target.files[0];
+    if(!file){
+      return ;
     }
+    
+    const reader=new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload=async()=>{
+      const base64Image=reader.result;
+      setThumbnail(base64Image);
+    }
+  }
+
+  const createPost= async (e)=>{
+    e.preventDefault();
+
+    const postData= new FormData();
+    postData.set('title',title)
+    postData.set('category',category)
+    postData.set('description',description)
+    postData.set('thumbnail',thumbnail)
+
+    try {
+      setIsLoading(true);
+      const response= await axiosInstance.post(
+        `/posts`,
+        postData ,
+        {withCredentials: true , headers: { Authorization: `Bearer ${token}`}}
+      )
+      toast.success("Post created sucessfully.")
+      if(response.status == 201){
+        return navigate('/');
+      }
+    } catch (err) {
+      setError(err.response.data.message);
+    }
+    finally{
+      setIsLoading(false);
+    }
+  }
 
   if(isLoading){
     return <Loader/>
@@ -92,7 +108,7 @@ const CreatePost = () => {
             }
           </select>
           <ReactQuill modules={module} formats={formats} value={description} onChange={setDescription}/>
-          <input type="file" onChange={e=> setThumbnail(e.target.files[0])} accept='png jpg jpeg'/>
+          <input type="file" onChange={thumbnailHandler} accept='png jpg jpeg'/>
           <button type='submit' className='btn primary'>Create</button>
           </form>
       </div>

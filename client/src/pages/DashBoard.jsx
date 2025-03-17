@@ -50,7 +50,7 @@ const DashBoard = () => {
             return <article key={post._id} className='dashboard_post'>
               <div className="dashboard_post-info">
                 <div className="dashboard_post-thumbnail">
-                  <img src={`${process.env.VITE_APP_ASSETS_URL}/uploads/${post.thumbnail}`} alt="Author Photo" />
+                  <img src={post.thumbnail} alt='Thumbnail' />
                 </div>
                 <h5>{post.title}</h5>
               </div>

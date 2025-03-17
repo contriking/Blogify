@@ -11,7 +11,7 @@ const PostItem = ({id,postID,thumbnail,category,title,description,authorID,creat
     return (
     <article className='post'>
         <div className="post_thumbnail">
-            <img src={`${process.env.VITE_APP_ASSETS_URL}/uploads/${thumbnail}`} alt={title} />
+            <img src={thumbnail} alt={title}/>
         </div>
         <div className="post_content">
             <Link to={`/posts/${postID}`}>

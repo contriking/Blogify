@@ -1,10 +1,8 @@
 const Post = require('../models/post');
 const User = require('../models/User');
-const path = require('path');
-const fs = require('fs');
-const {v4 : uuid} =require('uuid');
 const HttpError = require('../models/Error');
-
+const cloudinary = require('../utils/cloudinary.js')
+const {extractor} = require('../utils/pidExtractor.js')
 
 // Create a Post
 // POST :api/posts
@@ -12,38 +10,38 @@ const HttpError = require('../models/Error');
 const createPost=async (req,res,next)=>{
     try {
         
-        let {title,category,description} = req.body;
-        if(!title || !category || !description || !req.files){
+        let {title,category,description,thumbnail} = req.body;
+        if(!title || !category || !description || !thumbnail){
             return next(new HttpError("Please fill in all fields and choose thumbnail.",422));
         }
         
-        const { thumbnail } =req.files;
         // Check file size
         if(thumbnail.size > 2000000){
             return next(new HttpError("Thumbnail too big. File should be less than 2mb.",422))
         }
 
-        let fileName= thumbnail.name;
-        let splittedFile=fileName.split(".");
-        let newFileName=splittedFile[0]+ uuid() + '.' + splittedFile[splittedFile.length -  1];
-        thumbnail.mv(path.join(__dirname,"..","uploads",newFileName),async(error)=>{
-            if(error){
-                return next(new HttpError(error));
-            }
-            else{
-                const newPost = await Post.create({title,category,description,thumbnail:newFileName,
-                    creator: req.user.id});
-                if(!newPost){
-                    return next(new HttpError("Post couldn't be created.",422));
-                }
-                // Find the User and increase it's count by 1
-                const currUser=await User.findById(req.user.id);
-                const UserPostCount = currUser.posts + 1;
-                await User.findByIdAndUpdate(req.user.id, {posts : UserPostCount});
+        const uploadResponse=await cloudinary.uploader.upload(thumbnail,{folder:"Blogify"});
+        const newPost = await Post.create({
+            title,
+            category,
+            description,
+            thumbnail:uploadResponse.secure_url,
+            creator: req.user.id
+        });
 
-                res.status(201).json(newPost);
-            }
-        })
+        if(!newPost){
+            return next(new HttpError("Post couldn't be created.",422));
+        }
+        // Find the User and increase it's count by 1
+        const currUser=await User.findById(req.user.id);
+        const UserPostCount = currUser.posts + 1;
+        await User.findByIdAndUpdate(
+            req.user.id, 
+            {posts : UserPostCount}
+        );
+
+        res.status(201).json(newPost);
+
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -58,6 +56,7 @@ const getPosts=async (req,res,next)=>{
        
         const posts=await Post.find().sort({updatedAt: -1});
         res.status(200).json(posts);
+
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -76,6 +75,7 @@ const getPost=async (req,res,next)=>{
             return next(new HttpError("Post not found.",422));
         }
         res.status(200).json(post);
+
     } catch (error) {
         return next(new HttpError(error)); 
     }
@@ -87,10 +87,11 @@ const getPost=async (req,res,next)=>{
 // UnProtected
 const getCatPosts=async (req,res,next)=>{
     try {
-       
+
         const {category}=req.params;
         const catPosts = await Post.find({category}).sort({createdAt: -1});
         res.status(200).json(catPosts);
+
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -101,10 +102,11 @@ const getCatPosts=async (req,res,next)=>{
 // UnProtected
 const getUserPosts=async (req,res,next)=>{
     try {
-    
+
         const {id}=req.params;
         const posts=await Post.find({creator: id}).sort({createdAt: -1});
         res.status(200).json(posts);
+
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -116,8 +118,6 @@ const getUserPosts=async (req,res,next)=>{
 const editPost=async (req,res,next)=>{
     try {
       
-        let fileName;
-        let newFileName;
         let updatedPost;
         const postId=req.params.id;
         
@@ -137,7 +137,7 @@ const editPost=async (req,res,next)=>{
         }
     
         // If we don't have to update the thumbnail.
-        if(!req.files){
+        if(!req.body.thumbnail){
             updatedPost=await Post.findByIdAndUpdate(postId,{title,category,description},{new : true});
         }
         else{
@@ -146,28 +146,24 @@ const editPost=async (req,res,next)=>{
             if(!oldPost){
                 return next(new HttpError("Post not found.",422));
             }
+            
             // Delete the old thumbnail
-            fs.unlink(path.join(__dirname, "..", "uploads", oldPost.thumbnail),(err)=>{
-                if(err){
-                    return next(new HttpError(err));
-                }
-            })
+            const public_ID=extractor(oldPost.thumbnail);
+            cloudinary.uploader.destroy(`Blogify/${public_ID}`);
+
             // Update new thumbnail
-            const { thumbnail }=req.files;
+            const { thumbnail }=req.body;
             // Check file size
             if(thumbnail.size > 2000000){
                 return next(new HttpError("Thumbnail size is too big. Should be less than 2mb.",422));
             }
-            fileName=thumbnail.name;
-            let splittedFile=fileName.split(".");
-            newFileName=splittedFile[0] + uuid() +'.'+ splittedFile[splittedFile.length -1];
-            thumbnail.mv(path.join(__dirname,"..","uploads",newFileName),async(err)=>{
-                if(err){
-                    return next(new HttpError(err));
-                }
-                updatedPost=await Post.findByIdAndUpdate(postId,{title,category,description,thumbnail:newFileName},{new: true});
-            })
-            updatedPost=await Post.findByIdAndUpdate(postId,{title,category,description,thumbnail:newFileName},{new: true});
+            
+            const uploadResponse=await cloudinary.uploader.upload(thumbnail,{folder: "Blogify"})
+            updatedPost=await Post.findByIdAndUpdate(
+                postId,
+                {title,category,description,thumbnail:uploadResponse.secure_url},
+                {new: true}
+            );
         }
         if(!updatedPost){
             return next(new HttpError("Post couldn't be updated.",422));
@@ -189,23 +185,21 @@ const deletePost=async (req,res,next)=>{
             return next(new HttpError("Post not found.",400));
         }
         const post=await Post.findById(postId);
-        const fileName=post?.thumbnail;
+
         if(req.user.id !==post.creator.toString()){
             return next(new HttpError("You are not authorized to delete this post.",401));
         }
-        // delete thumbnail from uploads
-        fs.unlink(path.join(__dirname,"..","uploads",fileName),async(err)=>{
-            if(err){
-                return next(new HttpError(err));
-            }
-            else{
-                await Post.findByIdAndDelete(postId);
-                // Find the User and decrease it's count by 1
-                const currUser=await User.findById(req.user.id);
-                const UserPostCount= currUser.posts - 1;
-                await User.findByIdAndUpdate(req.user.id,{posts: UserPostCount});
-            }
-        })
+
+        // Delete the thumbnail
+        const public_ID = extractor(post?.thumbnail);
+        cloudinary.uploader.destroy(`Blogify/${public_ID}`);
+
+        await Post.findByIdAndDelete(postId);
+        // Find the User and decrease it's count by 1
+        const currUser=await User.findById(req.user.id);
+        const UserPostCount= currUser.posts - 1;
+        await User.findByIdAndUpdate(req.user.id,{posts: UserPostCount});
+
         res.json(`Post ${postId} deleted successfully.`);
     } catch (error) {
         return next(new HttpError(error));
