@@ -75,7 +75,12 @@ const CreatePost = () => {
       setIsLoading(true);
       const response= await axiosInstance.post(
         `/posts`,
-        postData ,
+        {
+          'title':title,
+          'category':category,
+          'description':description,
+          'thumbnail':thumbnail
+        } ,
         {withCredentials: true , headers: { Authorization: `Bearer ${token}`}}
       )
       toast.success("Post created sucessfully.")

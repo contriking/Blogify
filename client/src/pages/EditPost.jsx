@@ -93,7 +93,12 @@ const EditPost = () => {
       
       const response= await axiosInstance.patch(
         `/posts/${id}`,
-        postData ,
+        {
+          'title':title,
+          'category':category,
+          'description':description,
+          'thumbnail':thumbnail
+        } ,
         {withCredentials: true , headers: { Authorization: `Bearer ${token}`}}
       )
       .then(res=>{

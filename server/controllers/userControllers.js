@@ -99,7 +99,7 @@ const getUser=async(req,res,next)=>{
 // Protected
 const changeAvatar=async(req,res,next)=>{
     try {
-
+        
         if(!req.body.avatar){
             return next(new HttpError("Please choose an image.",422));
         }
@@ -142,7 +142,7 @@ const changeAvatar=async(req,res,next)=>{
 // Protected
 const editUser=async(req,res,next)=>{
     try {
-      
+         
         const {name,email,password,newPassword,confirmNewPassword}=req.body;
         if(!name || !email || !password || !newPassword){
             return next(new HttpError("Please fill in all fields.",422));

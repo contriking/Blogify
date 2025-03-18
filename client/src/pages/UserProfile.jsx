@@ -65,14 +65,21 @@ const UserProfile=()=>{
         try {
             setImageError('');
             if(selectedImg!==null){
-                const postData = new FormData();
-                postData.set('avatar',selectedImg)
+                // const postData = new FormData();
+                // postData.set('avatar',selectedImg)
                 const id=toast.loading("Please wait...")
-                const response = await axiosInstance.post(`/users/change-avatar`,postData,
+
+                const response = await axiosInstance.post(
+                    `/users/change-avatar`,
+                    {
+                        'avatar':selectedImg
+                    },
                     {withCredentials: true, headers: { Authorization: `Bearer ${token}`}}
                 ).then(res=>{
                     setAvatar(res?.data.avatar);
                     toast.update(id,{render:"Profile picture changed successfully.",type:"success",isLoading:false,autoClose:2000});
+                }).catch(err=>{
+                    toast.update(id,{render:"Profile could not be updated.",type:"error",isLoading:false,autoClose:2000});
                 })
                 
             }
@@ -81,6 +88,7 @@ const UserProfile=()=>{
             }
             
         } catch (error) {
+            toast.update(id,{render:"Profile could not be updated.",type:"error",isLoading:false,autoClose:2000});
             setImageError(error.response.data.message);
         }
     }
@@ -96,7 +104,15 @@ const UserProfile=()=>{
         userData.set('confirmNewPassword',confireNewPassword)
 
         try {
-            const response= await axiosInstance.patch(`/users/edit-user`,userData,
+            const response= await axiosInstance.patch(
+                `/users/edit-user`,
+                {
+                    'name':name,
+                    'email':email,
+                    'password':currentPassword,
+                    'newPassword':newPassword,
+                    'confirmNewPassword':confireNewPassword,
+                },
                 {withCredentials: true, headers: {Authorization: `Bearer ${token}`}}
             )
             toast.success("User detail updated.")
